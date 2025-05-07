@@ -30,8 +30,11 @@ if uploaded_file is not None:
         # Carrega o modelo treinado
         model = joblib.load("modelo_regressao_linear.pkl")
 
-        # Separa variáveis preditoras (X) e alvo (y)
-        X = df.drop(columns=["Índice geral", "Mês_Ano", "Mês_Ano_Convertido"])
+        # Alinhar a ordem das colunas conforme o modelo foi treinado
+        colunas_esperadas = model.feature_names_in_  # Recupera as colunas com as quais o modelo foi treinado
+        X = df[colunas_esperadas]  # Assegura que as colunas de entrada estão na ordem correta
+
+        # Separa a variável alvo
         y = df["Índice geral"]
 
         # Faz as previsões
