@@ -25,6 +25,8 @@ if uploaded_file is not None:
             return f"{mapa_meses[mes.lower()]}/20{ano}" if len(ano) == 2 else f"{mapa_meses[mes.lower()]}/{ano}"
 
         df["Mês_Ano_Convertido"] = df["Mês_Ano"].apply(converter_data)
+
+        # Converte para formato datetime
         df["Mês_Ano_Numérico"] = pd.to_datetime(df["Mês_Ano_Convertido"], format="%m/%Y")
 
         # Convertendo as datas para um formato numérico (número de dias desde uma data de referência)
@@ -32,8 +34,8 @@ if uploaded_file is not None:
 
         # Adicionando o filtro de data
         st.subheader("Filtro de Data")
-        data_inicio = st.date_input("Data de Início", df["Mês_Ano_Numérico"].min().date())
-        data_fim = st.date_input("Data de Fim", df["Mês_Ano_Numérico"].max().date())
+        data_inicio = st.date_input("Data de Início", df["Mês_Ano_Numérico"].min())
+        data_fim = st.date_input("Data de Fim", df["Mês_Ano_Numérico"].max())
 
         # Filtra os dados de acordo com o intervalo de datas
         df_filtrado = df[(df["Mês_Ano_Numérico"] >= pd.to_datetime(data_inicio)) & (df["Mês_Ano_Numérico"] <= pd.to_datetime(data_fim))]
