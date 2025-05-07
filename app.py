@@ -25,31 +25,39 @@ if uploaded_file is not None:
             return f"{mapa_meses[mes.lower()]}/20{ano}" if len(ano) == 2 else f"{mapa_meses[mes.lower()]}/{ano}"
 
         df["Mês_Ano_Convertido"] = df["Mês_Ano"].apply(converter_data)
-        df["Mês_Ano_Numérico"] = pd.to_datetime(df["Mês_Ano_Convertido"], format="%m/%Y").dt.strftime("%Y%m").astype(int)
+        df["Mês_Ano_Numérico"] = pd.to_datetime(df["Mês_Ano_Convertido"], format="%m/%Y")
+
+        # Adicionando o filtro de data
+        st.subheader("Filtro de Data")
+        data_inicio = st.date_input("Data de Início", df["Mês_Ano_Numérico"].min().date())
+        data_fim = st.date_input("Data de Fim", df["Mês_Ano_Numérico"].max().date())
+
+        # Filtra os dados de acordo com o intervalo de datas
+        df_filtrado = df[(df["Mês_Ano_Numérico"] >= pd.to_datetime(data_inicio)) & (df["Mês_Ano_Numérico"] <= pd.to_datetime(data_fim))]
 
         # Carrega o modelo treinado
         model = joblib.load("modelo_regressao_linear.pkl")
 
         # Alinhar a ordem das colunas conforme o modelo foi treinado
         colunas_esperadas = model.feature_names_in_  # Recupera as colunas com as quais o modelo foi treinado
-        X = df[colunas_esperadas]  # Assegura que as colunas de entrada estão na ordem correta
+        X = df_filtrado[colunas_esperadas]  # Assegura que as colunas de entrada estão na ordem correta
 
         # Separa a variável alvo
-        y = df["Índice geral"]
+        y = df_filtrado["Índice geral"]
 
         # Faz as previsões
         previsoes = model.predict(X)
-        df["Previsão IPCA"] = previsoes
+        df_filtrado["Previsão IPCA"] = previsoes
 
         # Exibe os resultados
         st.subheader("Resultados da Previsão")
-        st.dataframe(df[["Mês_Ano", "Índice geral", "Previsão IPCA"]])
+        st.dataframe(df_filtrado[["Mês_Ano", "Índice geral", "Previsão IPCA"]])
 
         # Gráfico comparando valores reais e previstos
         st.subheader("Gráfico: Valor Real vs Previsto")
         fig, ax = plt.subplots(figsize=(12,6))  # Aumenta o tamanho do gráfico para melhorar a visualização
-        ax.plot(df["Mês_Ano"], df["Índice geral"], label="Real", marker='o', linestyle='-', color='b')
-        ax.plot(df["Mês_Ano"], df["Previsão IPCA"], label="Previsto", marker='x', linestyle='--', color='orange')
+        ax.plot(df_filtrado["Mês_Ano"], df_filtrado["Índice geral"], label="Real", marker='o', linestyle='-', color='b')
+        ax.plot(df_filtrado["Mês_Ano"], df_filtrado["Previsão IPCA"], label="Previsto", marker='x', linestyle='--', color='orange')
         ax.set_xlabel("Mês/Ano", fontsize=12)  # Tamanho do texto no eixo X
         ax.set_ylabel("IPCA", fontsize=12)  # Tamanho do texto no eixo Y
         ax.set_title("Comparação entre Valor Real e Previsto", fontsize=14)  # Título maior
