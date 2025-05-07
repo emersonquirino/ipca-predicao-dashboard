@@ -30,12 +30,7 @@ if uploaded_file is not None:
     ]
 
     try:
-        X = df[['Mês_Ano_Numérico'] + variaveis_ipca]
-        y = df['Índice geral']
+    st.dataframe(df[['Mês_Ano', 'Índice geral', 'Previsão IPCA']])
+except KeyError as e:
+    st.error(f"Erro: coluna ausente no arquivo - {e}")
 
-        model = joblib.load("modelo_regressao_linear.pkl")
-        previsoes = model.predict(X)
-        df['Previsão IPCA'] = previsoes
-
-        st.subheader("Resultados da Previsão")
-        st.dat
