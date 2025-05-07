@@ -47,11 +47,27 @@ if uploaded_file is not None:
 
         # Gráfico comparando valores reais e previstos
         st.subheader("Gráfico: Valor Real vs Previsto")
-        fig, ax = plt.subplots()
-        ax.plot(df["Mês_Ano"], df["Índice geral"], label="Real", marker='o')
-        ax.plot(df["Mês_Ano"], df["Previsão IPCA"], label="Previsto", marker='x')
+        fig, ax = plt.subplots(figsize=(10,6))  # Aumenta o tamanho do gráfico para melhorar a visualização
+        ax.plot(df["Mês_Ano"], df["Índice geral"], label="Real", marker='o', linestyle='-', color='b')
+        ax.plot(df["Mês_Ano"], df["Previsão IPCA"], label="Previsto", marker='x', linestyle='--', color='orange')
+        ax.set_xlabel("Mês/Ano")  # Rótulo do eixo X
+        ax.set_ylabel("IPCA")  # Rótulo do eixo Y
+        ax.set_title("Comparação entre Valor Real e Previsto")  # Título do gráfico
         ax.legend()
+        plt.xticks(rotation=45)  # Gira as labels do eixo X para melhor leitura
         st.pyplot(fig)
+
+        # Cálculo das métricas do modelo
+        from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
+        mse = mean_squared_error(y, previsoes)
+        mae = mean_absolute_error(y, previsoes)
+        r2 = r2_score(y, previsoes)
+
+        # Exibindo as métricas
+        st.subheader("Métricas do Modelo")
+        st.write(f"Erro Quadrático Médio (MSE): {mse:.4f}")
+        st.write(f"Erro Absoluto Médio (MAE): {mae:.4f}")
+        st.write(f"Coeficiente de Determinação (R²): {r2:.4f}")
 
     except Exception as e:
         st.error(f"Ocorreu um erro: {e}")
