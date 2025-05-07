@@ -1,7 +1,6 @@
 import streamlit as st
 import pandas as pd
 import joblib
-import matplotlib.pyplot as plt
 
 st.title("Previsão do IPCA com Regressão Linear")
 
@@ -12,36 +11,37 @@ if uploaded_file is not None:
     # Leitura do CSV
     df = pd.read_csv(uploaded_file, sep=";")
 
-    # Padroniza nomes das colunas para bater com os do modelo treinado
-    df.columns = [col.strip().title() for col in df.columns]
+    # Normalização dos nomes das colunas
+    df.columns = df.columns.str.strip().str.lower()
 
     # Carregamento do modelo treinado
     model = joblib.load("modelo_regressao_linear.pkl")
 
     # Definição das variáveis de entrada (X) e saída (y)
     try:
-        X = df.drop(columns=["Indice Geral", "Mes_Ano"])
-        y = df["Indice Geral"]
+        X = df.drop(columns=["índice geral", "mês_ano"])
+        y = df["índice geral"]
 
         # Geração das previsões
         previsoes = model.predict(X)
 
         # Inserção das previsões no dataframe
-        df["Previsão IPCA"] = previsoes
+        df["previsão ipca"] = previsoes
 
         # Exibição do dataframe com resultados
         st.subheader("Resultados da Previsão")
-        st.dataframe(df[["Mes_Ano", "Indice Geral", "Previsão IPCA"]].head(10))
+        st.dataframe(df[["mês_ano", "índice geral", "previsão ipca"]].head(10))
 
-        # Gráfico comparativo
+        # Gráfico
         st.subheader("Gráfico: Valor Real vs Previsto")
+        import matplotlib.pyplot as plt
         fig, ax = plt.subplots()
-        ax.plot(df["Mes_Ano"], df["Indice Geral"], label="Real", marker='o')
-        ax.plot(df["Mes_Ano"], df["Previsão IPCA"], label="Previsto", marker='x')
-        ax.set_xlabel("Mês/Ano")
-        ax.set_ylabel("IPCA")
+        ax.plot(df["mês_ano"], df["índice geral"], label="Real", marker='o')
+        ax.plot(df["mês_ano"], df["previsão ipca"], label="Previsto", marker='x')
         ax.legend()
         st.pyplot(fig)
 
     except KeyError as e:
         st.error(f"Erro ao acessar as colunas esperadas no arquivo: {e}")
+        
+print("Atualização forçada")
