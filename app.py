@@ -10,29 +10,32 @@ uploaded_file = st.file_uploader("Escolha o arquivo CSV", type="csv")
 if uploaded_file is not None:
     df = pd.read_csv(uploaded_file, sep=";")
 
-    # Carrega o modelo treinado
-    model = joblib.load("modelo_regressao_linear.pkl")
+    # Mapear meses abreviados para números
+    mes_map = {
+        "jan": "01", "fev": "02", "mar": "03", "abr": "04",
+        "mai": "05", "jun": "06", "jul": "07", "ago": "08",
+        "set": "09", "out": "10", "nov": "11", "dez": "12"
+    }
+
+    # Separar e transformar a coluna Mês_Ano
+    df[['Mês', 'Ano']] = df['Mês_Ano'].str.split('/', expand=True)
+    df['Mês'] = df['Mês'].map(mes_map)
+    df['Ano'] = df['Ano'].apply(lambda x: f"{int(x):02d}")
+    df['Mês_Ano_Numérico'] = (df['Mês'] + df['Ano']).astype(int)
+
+    # Variáveis usadas no modelo
+    variaveis_ipca = [
+        'Alimentação e bebidas', 'Habitação', 'Artigos de residência', 'Vestuário',
+        'Transportes', 'Saúde e cuidados pessoais', 'Despesas pessoais', 'Educação', 'Comunicação'
+    ]
 
     try:
-        # Define as variáveis preditoras (X) e o alvo (y)
-        X = df.drop(columns=["Índice geral", "Mês_Ano"])
-        y = df["Índice geral"]
+        X = df[['Mês_Ano_Numérico'] + variaveis_ipca]
+        y = df['Índice geral']
 
-        # Faz as previsões
+        model = joblib.load("modelo_regressao_linear.pkl")
         previsoes = model.predict(X)
-        df["Previsão IPCA"] = previsoes
+        df['Previsão IPCA'] = previsoes
 
-        # Exibe os resultados
         st.subheader("Resultados da Previsão")
-        st.dataframe(df[["Mês_Ano", "Índice geral", "Previsão IPCA"]].head())
-
-        # Plota o gráfico
-        st.subheader("Gráfico: Valor Real vs Previsto")
-        fig, ax = plt.subplots()
-        ax.plot(df["Mês_Ano"], df["Índice geral"], label="Real", marker='o')
-        ax.plot(df["Mês_Ano"], df["Previsão IPCA"], label="Previsto", marker='x')
-        ax.legend()
-        st.pyplot(fig)
-
-    except KeyError as e:
-        st.error(f"Erro: coluna ausente no arquivo - {e}")
+        st.dat
