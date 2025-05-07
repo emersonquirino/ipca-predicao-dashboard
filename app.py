@@ -27,6 +27,9 @@ if uploaded_file is not None:
         df["Mês_Ano_Convertido"] = df["Mês_Ano"].apply(converter_data)
         df["Mês_Ano_Numérico"] = pd.to_datetime(df["Mês_Ano_Convertido"], format="%m/%Y")
 
+        # Convertendo as datas para um formato numérico (número de dias desde uma data de referência)
+        df["Mês_Ano_Numérico"] = (df["Mês_Ano_Numérico"] - df["Mês_Ano_Numérico"].min()).dt.days
+
         # Adicionando o filtro de data
         st.subheader("Filtro de Data")
         data_inicio = st.date_input("Data de Início", df["Mês_Ano_Numérico"].min().date())
