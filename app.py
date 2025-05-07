@@ -25,12 +25,7 @@ if uploaded_file is not None:
             return f"{mapa_meses[mes.lower()]}/20{ano}" if len(ano) == 2 else f"{mapa_meses[mes.lower()]}/{ano}"
 
         df["Mês_Ano_Convertido"] = df["Mês_Ano"].apply(converter_data)
-
-        # Converte "Mês_Ano_Convertido" para datetime
-        df["Mês_Ano_Numérico"] = pd.to_datetime(df["Mês_Ano_Convertido"], format="%m/%Y")
-
-        # Converte a data para um número representando os meses desde a primeira data
-        df["Meses_Desde_Inicio"] = (df["Mês_Ano_Numérico"] - df["Mês_Ano_Numérico"].min()) / pd.Timedelta(days=30)
+        df["Mês_Ano_Numérico"] = pd.to_datetime(df["Mês_Ano_Convertido"], format="%m/%Y").dt.strftime("%Y%m").astype(int)
 
         # Carrega o modelo treinado
         model = joblib.load("modelo_regressao_linear.pkl")
@@ -52,21 +47,14 @@ if uploaded_file is not None:
 
         # Gráfico comparando valores reais e previstos
         st.subheader("Gráfico: Valor Real vs Previsto")
-        fig, ax = plt.subplots(figsize=(12,6))  # Aumenta o tamanho do gráfico para melhorar a visualização
-        ax.plot(df["Mês_Ano_Numérico"], df["Índice geral"], label="Real", marker='o', linestyle='-', color='b')
-        ax.plot(df["Mês_Ano_Numérico"], df["Previsão IPCA"], label="Previsto", marker='x', linestyle='--', color='orange')
+        fig, ax = plt.subplots(figsize=(10,6))  # Aumenta o tamanho do gráfico para melhorar a visualização
+        ax.plot(df["Mês_Ano"], df["Índice geral"], label="Real", marker='o', linestyle='-', color='b')
+        ax.plot(df["Mês_Ano"], df["Previsão IPCA"], label="Previsto", marker='x', linestyle='--', color='orange')
         ax.set_xlabel("Mês/Ano")  # Rótulo do eixo X
         ax.set_ylabel("IPCA")  # Rótulo do eixo Y
         ax.set_title("Comparação entre Valor Real e Previsto")  # Título do gráfico
         ax.legend()
-
-        # Ajuste das datas no eixo X
-        ax.set_xticks(df["Mês_Ano_Numérico"])
-        ax.set_xticklabels(df["Mês_Ano_Convertido"], rotation=45, ha="right")
-
-        # Adicionando grid
-        ax.grid(True)
-
+        plt.xticks(rotation=45)  # Gira as labels do eixo X para melhor leitura
         st.pyplot(fig)
 
         # Cálculo das métricas do modelo
