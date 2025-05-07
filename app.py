@@ -25,7 +25,12 @@ if uploaded_file is not None:
             return f"{mapa_meses[mes.lower()]}/20{ano}" if len(ano) == 2 else f"{mapa_meses[mes.lower()]}/{ano}"
 
         df["Mês_Ano_Convertido"] = df["Mês_Ano"].apply(converter_data)
+
+        # Converte "Mês_Ano_Convertido" para datetime
         df["Mês_Ano_Numérico"] = pd.to_datetime(df["Mês_Ano_Convertido"], format="%m/%Y")
+
+        # Converte a data para um número representando os meses desde a primeira data
+        df["Meses_Desde_Inicio"] = (df["Mês_Ano_Numérico"] - df["Mês_Ano_Numérico"].min()) / pd.Timedelta(days=30)
 
         # Carrega o modelo treinado
         model = joblib.load("modelo_regressao_linear.pkl")
