@@ -65,3 +65,4 @@ Este projeto tem como objetivo construir um dashboard interativo para visualiza�
 ## ✍️ Autor
 
 Emerson Quirino — [LinkedIn](https://www.linkedin.com/in/emersonquirino)
+Pront
