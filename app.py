@@ -1,42 +1,35 @@
 import streamlit as st
 import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
 import joblib
 
-st.title("Previsão do IPCA com Regressão Linear Múltipla")
-st.markdown("Faça upload do CSV com os dados do IPCA (formato igual ao IPCA_Base.csv)")
+st.title("Previsão do IPCA com Regressão Linear")
 
-uploaded_file = st.file_uploader("Upload CSV", type="csv")
+# Upload do arquivo CSV
+uploaded_file = st.file_uploader("Escolha o arquivo CSV", type="csv")
 
 if uploaded_file is not None:
-    df = pd.read_csv(uploaded_file)
+    # Leitura do CSV
+    df = pd.read_csv(uploaded_file, sep=";")
+
+    # Normalização dos nomes das colunas
+    df.columns = df.columns.str.strip().str.lower()
+
+    # Carregamento do modelo treinado
     model = joblib.load("modelo_regressao_linear.pkl")
-    
-    X = df.drop(columns=["Indice geral", "Mes_Ano"])
-    y = df["Indice geral"]
-    
-    previsoes = model.predict(X)
-    df["Previsão IPCA"] = previsoes
 
-    st.subheader("Comparativo entre Valor Real e Previsto")
-    st.dataframe(df[["Mes_Ano", "Indice geral", "Previsão IPCA"]].head(10))
+    # Definição das variáveis de entrada (X) e saída (y)
+    try:
+        X = df.drop(columns=["índice geral", "mês_ano"])
+        y = df["índice geral"]
 
-    st.subheader("Gráfico: Valor Real vs Previsto")
-    fig, ax = plt.subplots()
-    ax.plot(df["Mes_Ano"], df["Indice geral"], label="Real", marker='o')
-    ax.plot(df["Mes_Ano"], df["Previsão IPCA"], label="Previsto", marker='x')
-    ax.legend()
-    plt.xticks(rotation=90)
-    plt.xlabel("Mes/Ano")
-    plt.ylabel("IPCA")
-    st.pyplot(fig)
+        # Geração das previsões
+        previsoes = model.predict(X)
 
-    st.subheader("Métricas do Modelo")
-    mse = np.mean((df["Indice geral"] - df["Previsão IPCA"])**2)
-    mae = np.mean(np.abs(df["Indice geral"] - df["Previsão IPCA"]))
-    r2 = 1 - (np.sum((df["Indice geral"] - df["Previsão IPCA"])**2) / np.sum((df["Indice geral"] - np.mean(df["Indice geral"]))**2))
-    
-    st.markdown(f"**Erro Quadrático Médio (MSE):** {mse:.4f}")
-    st.markdown(f"**Erro Absoluto Médio (MAE):** {mae:.4f}")
-    st.markdown(f"**Coeficiente de Determinação (R²):** {r2:.4f}")
+        # Inserção das previsões no dataframe
+        df["Previsão"] = previsoes
+
+        # Exibição do dataframe com resultados
+        st.subheader("Resultados da Previsão")
+        st.write(df)
+    except KeyError as e:
+        st.error(f"Erro ao acessar as colunas esperadas no arquivo: {e}")
