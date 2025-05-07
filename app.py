@@ -16,17 +16,21 @@ if uploaded_file is not None:
     model = joblib.load("modelo_regressao_linear.pkl")
 
     try:
-        # Definição das variáveis de entrada (X) e saída (y)
-        X = df.drop(columns=["Índice geral", "Mês_Ano"])
-        y = df["Índice geral"]
+        # Colunas utilizadas no modelo treinado
+        variaveis_ipca = [
+            'Alimentação e bebidas', 'Habitação', 'Artigos de residência', 'Vestuário',
+            'Transportes', 'Saúde e cuidados pessoais', 'Despesas pessoais', 'Educação', 'Comunicação'
+        ]
 
-        # Geração das previsões
+        # Variável de entrada (X) e saída (y)
+        X = df[['Mês_Ano_Numérico'] + variaveis_ipca]
+        y = df['Índice geral']
+
+        # Previsão
         previsoes = model.predict(X)
-
-        # Inserção das previsões no dataframe
         df["Previsão IPCA"] = previsoes
 
-        # Exibição do dataframe com resultados
+        # Exibição dos dados
         st.subheader("Resultados da Previsão")
         st.dataframe(df[["Mês_Ano", "Índice geral", "Previsão IPCA"]].head())
 
