@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import joblib
+import matplotlib.pyplot as plt
 
 st.title("Previsão do IPCA com Regressão Linear")
 
@@ -16,8 +17,8 @@ if uploaded_file is not None:
 
     try:
         # Definição das variáveis de entrada (X) e saída (y)
-        X = df.drop(columns=["Indice Geral", "Mes_Ano"])
-        y = df["Indice Geral"]
+        X = df.drop(columns=["Índice geral", "Mês_Ano"])
+        y = df["Índice geral"]
 
         # Geração das previsões
         previsoes = model.predict(X)
@@ -27,14 +28,13 @@ if uploaded_file is not None:
 
         # Exibição do dataframe com resultados
         st.subheader("Resultados da Previsão")
-        st.dataframe(df[["Mes_Ano", "Indice Geral", "Previsão IPCA"]].head())
+        st.dataframe(df[["Mês_Ano", "Índice geral", "Previsão IPCA"]].head())
 
         # Gráfico
         st.subheader("Gráfico: Valor Real vs Previsto")
-        import matplotlib.pyplot as plt
         fig, ax = plt.subplots()
-        ax.plot(df["Mes_Ano"], df["Indice Geral"], label="Real", marker='o')
-        ax.plot(df["Mes_Ano"], df["Previsão IPCA"], label="Previsto", marker='x')
+        ax.plot(df["Mês_Ano"], df["Índice geral"], label="Real", marker='o')
+        ax.plot(df["Mês_Ano"], df["Previsão IPCA"], label="Previsto", marker='x')
         ax.legend()
         st.pyplot(fig)
 
