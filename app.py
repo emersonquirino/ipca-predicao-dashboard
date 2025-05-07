@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd
 import joblib
 import matplotlib.pyplot as plt
-from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 
 st.title("Previsão do IPCA com Regressão Linear")
 
@@ -46,21 +45,23 @@ if uploaded_file is not None:
         st.subheader("Resultados da Previsão")
         st.dataframe(df[["Mês_Ano", "Índice geral", "Previsão IPCA"]])
 
-        # Histórico e Tendências: Gráfico com os dados reais e a previsão
-        st.subheader("Histórico e Tendência do IPCA")
-
-        # Gráfico histórico com os valores reais de IPCA e as previsões
-        fig, ax = plt.subplots(figsize=(10,6))
+        # Gráfico comparando valores reais e previstos
+        st.subheader("Gráfico: Valor Real vs Previsto")
+        fig, ax = plt.subplots(figsize=(12,6))  # Aumenta o tamanho do gráfico para melhorar a visualização
         ax.plot(df["Mês_Ano"], df["Índice geral"], label="Real", marker='o', linestyle='-', color='b')
         ax.plot(df["Mês_Ano"], df["Previsão IPCA"], label="Previsto", marker='x', linestyle='--', color='orange')
-        ax.set_xlabel("Mês/Ano")  # Rótulo do eixo X
-        ax.set_ylabel("IPCA")  # Rótulo do eixo Y
-        ax.set_title("Comparação entre Valor Real e Previsto")  # Título do gráfico
+        ax.set_xlabel("Mês/Ano", fontsize=12)  # Tamanho do texto no eixo X
+        ax.set_ylabel("IPCA", fontsize=12)  # Tamanho do texto no eixo Y
+        ax.set_title("Comparação entre Valor Real e Previsto", fontsize=14)  # Título maior
         ax.legend()
-        plt.xticks(rotation=45)  # Gira as labels do eixo X para melhor leitura
+
+        # Ajustando as labels no eixo X
+        plt.xticks(rotation=45, ha="right", fontsize=10)  # Gira as labels e ajusta o alinhamento
+        plt.tight_layout()  # Ajusta o layout para não cortar labels
         st.pyplot(fig)
 
         # Cálculo das métricas do modelo
+        from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
         mse = mean_squared_error(y, previsoes)
         mae = mean_absolute_error(y, previsoes)
         r2 = r2_score(y, previsoes)
