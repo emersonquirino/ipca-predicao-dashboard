@@ -22,8 +22,15 @@ if uploaded_file is not None:
 
         # Converte "jan/20" em "01/2020"
         def converter_data(mes_ano):
-            mes, ano = mes_ano.split("/")
-            return f"{mapa_meses[mes.lower()]}/20{ano}" if len(ano) == 2 else f"{mapa_meses[mes.lower()]}/{ano}"
+            try:
+                mes, ano = mes_ano.split("/")
+                mes = mapa_meses.get(mes.lower())
+                if mes:  # Verifica se o mês existe no mapeamento
+                    return f"{mes}/20{ano}" if len(ano) == 2 else f"{mes}/{ano}"
+                else:
+                    raise ValueError(f"Mês '{mes}' não reconhecido")
+            except Exception as e:
+                raise ValueError(f"Erro ao converter a data: {e}")
 
         df["Mês_Ano_Convertido"] = df["Mês_Ano"].apply(converter_data)
         df["Mês_Ano_Numérico"] = pd.to_datetime(df["Mês_Ano_Convertido"], format="%m/%Y").dt.strftime("%Y%m").astype(int)
