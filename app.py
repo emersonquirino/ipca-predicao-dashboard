@@ -1,72 +1,48 @@
 import streamlit as st
 import pandas as pd
-import joblib
 import matplotlib.pyplot as plt
+from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 
 st.title("Previsão do IPCA com Regressão Linear")
 
-# Upload do arquivo CSV
-uploaded_file = st.file_uploader("Escolha o arquivo CSV", type="csv")
+# Upload do arquivo CSV com resultados prontos
+uploaded_file = st.file_uploader("Escolha o arquivo CSV com os dados de previsão", type="csv")
 
 if uploaded_file is not None:
     try:
         # Leitura do CSV
         df = pd.read_csv(uploaded_file, sep=";")
 
-        # Mapeamento manual dos meses em português
-        mapa_meses = {
-            "jan": "01", "fev": "02", "mar": "03", "abr": "04", "mai": "05", "jun": "06",
-            "jul": "07", "ago": "08", "set": "09", "out": "10", "nov": "11", "dez": "12"
-        }
+        # Criação do eixo de tempo fictício baseado na ordem dos dados
+        df["Período"] = [f"M{str(i+1).zfill(2)}" for i in range(len(df))]
 
-        # Converte "jan/20" em "01/2020"
-        def converter_data(mes_ano):
-            mes, ano = mes_ano.split("/")
-            return f"{mapa_meses[mes.lower()]}/20{ano}" if len(ano) == 2 else f"{mapa_meses[mes.lower()]}/{ano}"
+        # Renomeando colunas, se necessário
+        df.columns = df.columns.str.strip()
 
-        df["Mês_Ano_Convertido"] = df["Mês_Ano"].apply(converter_data)
-        df["Mês_Ano_Numérico"] = pd.to_datetime(df["Mês_Ano_Convertido"], format="%m/%Y").dt.strftime("%Y%m").astype(int)
-
-        # Carrega o modelo treinado
-        model = joblib.load("modelo_regressao_linear.pkl")
-
-        # Alinhar a ordem das colunas conforme o modelo foi treinado
-        colunas_esperadas = model.feature_names_in_  # Recupera as colunas com as quais o modelo foi treinado
-        X = df[colunas_esperadas]  # Assegura que as colunas de entrada estão na ordem correta
-
-        # Separa a variável alvo
-        y = df["Índice geral"]
-
-        # Faz as previsões
-        previsoes = model.predict(X)
-        df["Previsão IPCA"] = previsoes
-
-        # Exibe os resultados
+        # Exibe os dados
         st.subheader("Resultados da Previsão")
-        st.dataframe(df[["Mês_Ano", "Índice geral", "Previsão IPCA"]])
+        st.dataframe(df)
 
         # Gráfico comparando valores reais e previstos
         st.subheader("Gráfico: Valor Real vs Previsto")
-        fig, ax = plt.subplots(figsize=(12,6))  # Aumenta o tamanho do gráfico para melhorar a visualização
-        ax.plot(df["Mês_Ano"], df["Índice geral"], label="Real", marker='o', linestyle='-', color='b')
-        ax.plot(df["Mês_Ano"], df["Previsão IPCA"], label="Previsto", marker='x', linestyle='--', color='orange')
-        ax.set_xlabel("Mês/Ano", fontsize=12)  # Tamanho do texto no eixo X
-        ax.set_ylabel("IPCA", fontsize=12)  # Tamanho do texto no eixo Y
-        ax.set_title("Comparação entre Valor Real e Previsto", fontsize=14)  # Título maior
+        fig, ax = plt.subplots(figsize=(12,6))
+        ax.plot(df["Período"], df["Índice geral Real"], label="Real", marker='o', linestyle='-', color='blue')
+        ax.plot(df["Período"], df["Índice geral Previsto"], label="Previsto", marker='x', linestyle='--', color='orange')
+        ax.set_xlabel("Período")
+        ax.set_ylabel("IPCA")
+        ax.set_title("Comparação entre Valor Real e Previsto")
         ax.legend()
-
-        # Ajustando as labels no eixo X
-        plt.xticks(rotation=45, ha="right", fontsize=10)  # Gira as labels e ajusta o alinhamento
-        plt.tight_layout()  # Ajusta o layout para não cortar labels
+        plt.xticks(rotation=45, ha="right")
+        plt.tight_layout()
         st.pyplot(fig)
 
-        # Cálculo das métricas do modelo
-        from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
-        mse = mean_squared_error(y, previsoes)
-        mae = mean_absolute_error(y, previsoes)
-        r2 = r2_score(y, previsoes)
+        # Métricas
+        y_true = df["Índice geral Real"]
+        y_pred = df["Índice geral Previsto"]
+        mse = mean_squared_error(y_true, y_pred)
+        mae = mean_absolute_error(y_true, y_pred)
+        r2 = r2_score(y_true, y_pred)
 
-        # Exibindo as métricas
         st.subheader("Métricas do Modelo")
         st.write(f"Erro Quadrático Médio (MSE): {mse:.4f}")
         st.write(f"Erro Absoluto Médio (MAE): {mae:.4f}")
