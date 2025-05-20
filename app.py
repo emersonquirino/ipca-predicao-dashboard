@@ -14,7 +14,7 @@ if uploaded_file is not None:
         df = pd.read_csv(uploaded_file, sep=";")
 
         # Criação do eixo de tempo fictício baseado na ordem dos dados
-        df["Período"] = [f"M{str(i+1).zfill(2)}" for i in range(len(df))]
+        df["Período"] = [f"P{str(i+1).zfill(2)}" for i in range(len(df))]
 
         # Renomeando colunas, se necessário
         df.columns = df.columns.str.strip()
