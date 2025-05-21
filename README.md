@@ -1,4 +1,4 @@
-echo "# 📈 IPCA Dashboard com Predição
+# 📈 IPCA Dashboard com Predição
 
 Este projeto constrói um **dashboard interativo** para análise e predição do **IPCA** (Índice Nacional de Preços ao Consumidor Amplo), utilizando **regressão linear**, métricas de avaliação e explicações visuais que facilitam a interpretação dos resultados.
 
