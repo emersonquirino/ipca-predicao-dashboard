@@ -14,6 +14,7 @@ Este painel interativo permite a visualização dos resultados de um modelo de r
 Você poderá:
 - Comparar valores **reais** e **previstos** do IPCA;
 - Consultar **métricas de desempenho** do modelo;
+- Interpretar visualmente os resultados;
 - **Baixar** o resultado completo com os cálculos de erro.
 """)
 
@@ -24,6 +25,8 @@ if uploaded_file is not None:
     try:
         # Leitura do CSV
         df = pd.read_csv(uploaded_file, sep=";")
+
+        # Renomeando colunas
         df.columns = df.columns.str.strip()
 
         # Cálculo das colunas auxiliares
@@ -32,11 +35,11 @@ if uploaded_file is not None:
         df["Acerto"] = df["Erro Absoluto"] <= 0.1
 
         # Exibe os dados
-        st.subheader("Resultados da Previsão")
+        st.subheader("📋 Resultados da Previsão")
         st.dataframe(df.drop(columns=["Período"], errors="ignore"))
 
         # Gráfico: Real vs Previsto (scatter)
-        st.subheader("Gráfico: Comparativo Real vs Previsto")
+        st.subheader("📊 Gráfico: Comparativo Real vs Previsto")
         fig, ax = plt.subplots(figsize=(10, 6))
         ax.scatter(df["Índice geral Real"], df["Índice geral Previsto"], color='purple', label="Pontos de previsão")
         ax.plot([df["Índice geral Real"].min(), df["Índice geral Real"].max()],
@@ -48,6 +51,13 @@ if uploaded_file is not None:
         ax.legend()
         st.pyplot(fig)
 
+        # Explicação do gráfico
+        st.markdown("""
+🔍 **Como interpretar o gráfico:**  
+Cada ponto representa um mês. A linha cinza mostra o ideal (quando previsto = real).  
+Pontos próximos à linha indicam boa previsão. Pontos distantes indicam maior erro.
+""")
+
         # Métricas
         y_true = df["Índice geral Real"]
         y_pred = df["Índice geral Previsto"]
@@ -55,30 +65,38 @@ if uploaded_file is not None:
         mae = mean_absolute_error(y_true, y_pred)
         r2 = r2_score(y_true, y_pred)
 
-        st.subheader("Métricas do Modelo")
+        st.subheader("📏 Métricas do Modelo")
         st.write(f"Erro Quadrático Médio (MSE): {mse:.4f}")
         st.write(f"Erro Absoluto Médio (MAE): {mae:.4f}")
         st.write(f"Coeficiente de Determinação (R²): {r2:.4f}")
 
-        acuracia = df["Acerto"].mean() * 100
-        st.write(f"Acurácia com erro ≤ 0.1: {acuracia:.2f}%")
-
-        # Explicação automática do R²
-        st.subheader(" Avaliação do Modelo")
+        # Interpretação do R²
         if r2 >= 0.95:
-            explicacao = "O modelo apresenta **excelente desempenho**: as previsões estão muito próximas dos valores reais."
+            emoji = "🟢"
+            explicacao = "Modelo com **excelente desempenho**"
         elif r2 >= 0.85:
-            explicacao = "O modelo possui **bom desempenho**, capturando bem a tendência dos dados com pequenas variações."
+            emoji = "🟡"
+            explicacao = "Modelo com **bom desempenho**"
         elif r2 >= 0.7:
-            explicacao = "O modelo tem **desempenho razoável**, mas há margem para melhorias na precisão das previsões."
+            emoji = "🟠"
+            explicacao = "Modelo com **desempenho razoável**"
         else:
-            explicacao = "O modelo apresenta **baixo desempenho**: as previsões divergem significativamente dos valores reais."
+            emoji = "🔴"
+            explicacao = "Modelo com **baixo desempenho**"
 
-        st.write(explicacao)
+        st.subheader("🧠 Interpretação do Modelo")
+        st.markdown(f"{emoji} {explicacao}")
 
-        # Download do CSV
+        if r2 < 0.85:
+            st.warning("🔧 Dica: Tente incluir mais variáveis explicativas ou usar modelos mais complexos para melhorar a precisão.")
+
+        # Acurácia com tolerância
+        acuracia = df["Acerto"].mean() * 100
+        st.write(f"🎯 Acurácia com erro ≤ 0.1: **{acuracia:.2f}%**")
+
+        # Botão de download do CSV com colunas extras
         csv = df.to_csv(index=False, sep=";").encode('utf-8-sig')
-        st.download_button("Baixar resultados com erros calculados", csv, file_name="resultado_completo.csv", mime='text/csv')
+        st.download_button("📥 Baixar resultados com erros calculados", csv, file_name="resultado_completo.csv", mime='text/csv')
 
     except Exception as e:
-        st.error(f"Ocorreu um erro: {e}")
+        st.error(f"❌ Ocorreu um erro: {e}")
