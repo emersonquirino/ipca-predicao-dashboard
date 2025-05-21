@@ -64,7 +64,7 @@ if uploaded_file is not None:
         st.write(f"Acurácia com erro ≤ 0.1: {acuracia:.2f}%")
 
         # Explicação automática do R²
-        st.subheader("🧠 Interpretação do Modelo")
+        st.subheader(" Avaliação do Modelo")
         if r2 >= 0.95:
             explicacao = "O modelo apresenta **excelente desempenho**: as previsões estão muito próximas dos valores reais."
         elif r2 >= 0.85:
