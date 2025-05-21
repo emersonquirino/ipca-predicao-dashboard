@@ -1,68 +1,46 @@
 # IPCA Dashboard com Predição
 
-Este projeto tem como objetivo construir um dashboard interativo para visualização e predição do IPCA (Índice Nacional de Preços ao Consumidor Amplo), utilizando técnicas de machine learning e visualização de dados com a biblioteca `streamlit`.
+Este projeto apresenta um dashboard interativo para análise e visualização da performance de um modelo de Regressão Linear treinado para prever o IPCA.
 
-## 🔍 Objetivos
+## 📌 O que esta aplicação faz
 
-- Coletar e tratar dados históricos do IPCA.
-- Treinar modelos de predição com base nos dados tratados.
-- Construir uma aplicação web interativa para exibição de gráficos e previsões.
+A aplicação permite:
 
-## 🧠 Tecnologias Utilizadas
+- Carregar um arquivo CSV com os valores reais e previstos do IPCA;
+- Comparar visualmente os resultados com um gráfico de dispersão (real vs previsto);
+- Calcular automaticamente os principais indicadores de desempenho do modelo;
+- Avaliar a acurácia das previsões com base em uma margem de tolerância;
+- Baixar o conjunto de dados completo com os erros calculados.
 
-- **Python** — linguagem principal.
-- **Pandas & NumPy** — tratamento e manipulação dos dados.
-- **Scikit-Learn** — treinamento de modelos de machine learning.
-- **Matplotlib & Seaborn** — visualização de dados.
-- **Streamlit** — criação do dashboard web.
-- **Pickle** — serialização dos modelos.
-- **Git** — versionamento de código.
+## 🧪 Métricas calculadas
 
-## 📊 Funcionalidades do Dashboard
+A aplicação calcula e exibe:
 
-- Gráfico da série histórica do IPCA.
-- Predições com base em modelos treinados.
-- Interface simples e intuitiva via browser.
-- Upload de novos dados para análise.
+- **Erro Quadrático Médio (MSE)**: penaliza mais os grandes erros;
+- **Erro Absoluto Médio (MAE)**: média das diferenças absolutas;
+- **Coeficiente de Determinação (R²)**: indica a proporção da variabilidade explicada;
+- **Acurácia (Erro ≤ 0.1)**: percentual de previsões com erro absoluto até 0.1.
 
-## 🚀 Como Executar Localmente
+## 📈 Visualizações incluídas
 
-1. Clone o repositório:
-    ```bash
-    git clone https://github.com/emersonquirino/ipca-predicao-dashboard.git
-    cd ipca-predicao-dashboard
-    ```
+- **Gráfico de Dispersão Real vs Previsto**: compara diretamente os valores reais e estimados pelo modelo.
+- **Linha de tendência ideal (y = x)**: ajuda a identificar o quão próximo os pontos estão da previsão perfeita.
 
-2. Crie e ative um ambiente virtual:
-    ```bash
-    python -m venv venv
-    venv\Scripts\activate    # Windows
-    source venv/bin/activate # Linux/Mac
-    ```
+## 📂 Entrada esperada
 
-3. Instale as dependências:
-    ```bash
-    pip install -r requirements.txt
-    ```
+O arquivo CSV deve conter ao menos duas colunas com os nomes:
+- `Índice geral Real`
+- `Índice geral Previsto`
 
-4. Execute o dashboard:
-    ```bash
-    streamlit run app.py
-    ```
 
-5. Acesse no navegador: `http://localhost:8501`
+## ✅ Resultados gerados
 
-## 📁 Estrutura do Projeto
+Ao processar o CSV, o app:
+- Cria colunas auxiliares (`Erro`, `Erro Absoluto`, `Acerto`);
+- Gera os gráficos e métricas de forma interativa;
+- Permite baixar o CSV com os erros calculados.
 
-│
-├── app.py # Código principal do dashboard Streamlit
-├── modelo.pkl # Modelo de machine learning serializado
-├── dados/ # Pasta com dados utilizados
-│ └── ipca.csv
-├── requirements.txt # Dependências do projeto
-└── README.md # Este arquivo
 
-## ✍️ Autor
+---
 
-Emerson Quirino — [LinkedIn](https://www.linkedin.com/in/emersonquirino)
-Pront
+Desenvolvido por Emerson Quirino.
