@@ -13,7 +13,7 @@ Este painel interativo permite a visualização dos resultados de um modelo de r
 
 Você poderá:
 - Comparar valores **reais** e **previstos** do IPCA;
-- Analisar **desempenho do modelo** com métricas;
+- Consultar **métricas de desempenho** do modelo;
 - **Baixar** o resultado completo com os cálculos de erro.
 """)
 
@@ -24,8 +24,6 @@ if uploaded_file is not None:
     try:
         # Leitura do CSV
         df = pd.read_csv(uploaded_file, sep=";")
-
-        # Renomeando colunas, se necessário
         df.columns = df.columns.str.strip()
 
         # Cálculo das colunas auxiliares
@@ -62,11 +60,23 @@ if uploaded_file is not None:
         st.write(f"Erro Absoluto Médio (MAE): {mae:.4f}")
         st.write(f"Coeficiente de Determinação (R²): {r2:.4f}")
 
-        # Métrica adicional: acurácia dentro de faixa de tolerância
         acuracia = df["Acerto"].mean() * 100
         st.write(f"Acurácia com erro ≤ 0.1: {acuracia:.2f}%")
 
-        # Botão de download do CSV com colunas extras
+        # Explicação automática do R²
+        st.subheader("🧠 Interpretação do Modelo")
+        if r2 >= 0.95:
+            explicacao = "O modelo apresenta **excelente desempenho**: as previsões estão muito próximas dos valores reais."
+        elif r2 >= 0.85:
+            explicacao = "O modelo possui **bom desempenho**, capturando bem a tendência dos dados com pequenas variações."
+        elif r2 >= 0.7:
+            explicacao = "O modelo tem **desempenho razoável**, mas há margem para melhorias na precisão das previsões."
+        else:
+            explicacao = "O modelo apresenta **baixo desempenho**: as previsões divergem significativamente dos valores reais."
+
+        st.write(explicacao)
+
+        # Download do CSV
         csv = df.to_csv(index=False, sep=";").encode('utf-8-sig')
         st.download_button("Baixar resultados com erros calculados", csv, file_name="resultado_completo.csv", mime='text/csv')
 
