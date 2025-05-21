@@ -13,8 +13,7 @@ Este painel interativo permite a visualização dos resultados de um modelo de r
 
 Você poderá:
 - Comparar valores **reais** e **previstos** do IPCA;
-- Analisar **distribuição dos erros**;
-- Consultar **métricas de desempenho** do modelo;
+- Analisar **desempenho do modelo** com métricas;
 - **Baixar** o resultado completo com os cálculos de erro.
 """)
 
@@ -50,14 +49,6 @@ if uploaded_file is not None:
         ax.set_title("Dispersão entre valores Reais e Previstos")
         ax.legend()
         st.pyplot(fig)
-
-        # Boxplot dos erros
-        st.subheader("Distribuição dos Erros de Previsão")
-        fig2, ax2 = plt.subplots()
-        ax2.boxplot(df["Erro"])
-        ax2.set_title("Boxplot dos Erros (Real - Previsto)")
-        ax2.set_ylabel("Erro")
-        st.pyplot(fig2)
 
         # Métricas
         y_true = df["Índice geral Real"]
