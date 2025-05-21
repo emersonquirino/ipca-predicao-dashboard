@@ -18,27 +18,28 @@ if uploaded_file is not None:
         st.subheader("Resultados da Previsão")
         st.dataframe(df[["Índice geral Real", "Índice geral Previsto"]])
 
-        # Gráfico de dispersão comparando valores reais vs previstos
-        st.subheader("Gráfico: Real vs Previsto (Dispersão)")
-        fig, ax = plt.subplots(figsize=(8, 6))
-        ax.scatter(df["Índice geral Real"], df["Índice geral Previsto"], color='purple', alpha=0.7)
-        ax.plot([df["Índice geral Real"].min(), df["Índice geral Real"].max()],
-                [df["Índice geral Real"].min(), df["Índice geral Real"].max()],
-                color='gray', linestyle='--', label="Linha Ideal (y = x)")
-        ax.set_xlabel("Índice Geral Real")
-        ax.set_ylabel("Índice Geral Previsto")
-        ax.set_title("Dispersão entre valores Reais e Previsto")
-        ax.legend()
-        plt.tight_layout()
-        st.pyplot(fig)
-
-        # Métricas do modelo
+        # Cálculo das métricas
         y_true = df["Índice geral Real"]
         y_pred = df["Índice geral Previsto"]
         mse = mean_squared_error(y_true, y_pred)
         mae = mean_absolute_error(y_true, y_pred)
         r2 = r2_score(y_true, y_pred)
 
+        # Gráfico de dispersão com R² no título
+        st.subheader("Gráfico: Real vs Previsto (Dispersão)")
+        fig, ax = plt.subplots(figsize=(8, 6))
+        ax.scatter(y_true, y_pred, color='purple', alpha=0.7)
+        ax.plot([y_true.min(), y_true.max()],
+                [y_true.min(), y_true.max()],
+                color='gray', linestyle='--', label="Linha Ideal (y = x)")
+        ax.set_xlabel("Índice Geral Real")
+        ax.set_ylabel("Índice Geral Previsto")
+        ax.set_title(f"Dispersão entre Reais e Previstos (R² = {r2:.4f})")
+        ax.legend()
+        plt.tight_layout()
+        st.pyplot(fig)
+
+        # Métricas abaixo do gráfico
         st.subheader("Métricas do Modelo")
         st.write(f"Erro Quadrático Médio (MSE): {mse:.4f}")
         st.write(f"Erro Absoluto Médio (MAE): {mae:.4f}")
