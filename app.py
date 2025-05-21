@@ -15,10 +15,6 @@ Aqui você encontrará:
 - **Métricas de avaliação** do modelo, como MSE, MAE e R²;
 - Um gráfico de **dispersão** que mostra a relação entre valores reais e previstos.
 
-Para utilizar:
-1. Faça upload de um arquivo `.csv` com os dados estruturados conforme o modelo;
-2. Visualize a comparação dos valores;
-3. Analise o desempenho do modelo com base nas métricas.
 """)
 
 # Upload do arquivo CSV com resultados prontos
