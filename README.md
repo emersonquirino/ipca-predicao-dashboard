@@ -81,6 +81,7 @@ Este projeto constrói um **dashboard interativo** para análise e predição do
 
 ## ✍️ Autor
 
+**Bianca Gube**
 **Emerson Quirino**  
-[🔗 LinkedIn](https://www.linkedin.com/in/emersonquirino)
-" > README.md && git add README.md && git commit -m "Atualiza README com novas funcionalidades e explicações" && git push origin main
+**Mayara Reghin**
+
