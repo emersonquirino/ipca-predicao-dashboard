@@ -84,5 +84,6 @@ Este projeto constrói um **dashboard interativo** para análise e predição do
 **Bianca Gobe**
 
 **Emerson Quirino**  
+
 **Mayara Reghin**
 
