@@ -81,7 +81,8 @@ Este projeto constrói um **dashboard interativo** para análise e predição do
 
 ## ✍️ Autor
 
-**Bianca Gube**
+**Bianca Gobe**
+
 **Emerson Quirino**  
 **Mayara Reghin**
 
